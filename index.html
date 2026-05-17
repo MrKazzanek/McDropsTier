@@ -133,6 +133,16 @@
         .copy-cmd-btn.success { background: #2ecc71; border-color: #2ecc71; color: white; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); }
         
         .features-box { background: var(--bg-main); padding: 25px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 40px; line-height: 1.6; font-size: 1.05rem; border: 1px solid var(--border-color); }
+        
+        /* STYLIZACJA DLA ZNACZNIKÓW HTML W OPISIE */
+        #m-features p { margin-bottom: 10px; }
+        #m-features ul, #m-features ol { margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
+        #m-features li { margin-bottom: 5px; }
+        #m-features a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        #m-features a:hover { text-decoration: underline; }
+        #m-features strong, #m-features b { color: var(--text-main); }
+        #m-features code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+        [data-theme="light"] #m-features code { background: rgba(0,0,0,0.05); }
 
         /* === SEKCJA OPINII (Filtry i checkbox) === */
         .reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
@@ -268,7 +278,7 @@
                 
                 <div class="features-box">
                     <h3 style="margin-bottom: 10px; color: var(--accent);" data-i18n="features_title">✨ Co nowego w tym dropie?</h3>
-                    <p id="m-features"></p>
+                    <div id="m-features"></div>
                 </div>
 
                 <div class="reviews-header">
@@ -478,7 +488,9 @@
             document.getElementById('m-date').innerText = `${t('date')} ${dDate}`;
             
             document.getElementById('m-stars').innerHTML = renderStars(drop.avg_rating) + `<span style="font-size:1.1rem; color:var(--text-muted); margin-left:15px;"> ${drop.review_count} ${grammarWord}</span>`;
-            document.getElementById('m-features').innerText = dFeat;
+            
+            // Zmiana z innerText na innerHTML pozwala na poprawne wyświetlanie znaczników HTML (<br>, <b>, <ul>, itp.)
+            document.getElementById('m-features').innerHTML = dFeat;
             
             document.getElementById('review-sort').value = 'newest';
             document.getElementById('m-reviews').innerHTML = `<div style="text-align:center; padding: 20px; color: var(--accent); font-weight:bold;">${t('loading_reviews')}</div>`;
