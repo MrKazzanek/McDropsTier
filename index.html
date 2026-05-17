@@ -314,7 +314,7 @@
     <!-- STOPKA -->
     <footer>
         QozaWorks &copy; 2026. <span style="color:var(--text-muted); font-weight:normal;" data-i18n="footer_rights">Wszelkie prawa zastrzeżone.</span> <br>
-        <span style="color:var(--text-muted); font-weight:normal;" data-i18n="footer_made"></span> <span style="color:var(--accent);">Minecraft.</span>.
+        <span style="color:var(--text-muted); font-weight:normal;" data-i18n="footer_made"></span> <span style="color:var(--accent);">Minecraft</span>.
     </footer>
 
     <script>
@@ -431,8 +431,8 @@
                     <div class="card-content">
                         <div class="card-title">${drop.name}</div>
                         <div class="card-versions">
-                            <span class="version-badge">☕ ${drop.java_version}</span>
-                            <span class="version-badge">📱 ${drop.bedrock_version}</span>
+                            <span class="version-badge">${drop.java_version}</span>
+                            <span class="version-badge">${drop.bedrock_version}</span>
                         </div>
                         <div class="stars">
                             ${renderStars(drop.avg_rating)} 
@@ -488,9 +488,9 @@
 
             document.getElementById('m-banner').src = drop.banner_url;
             document.getElementById('m-title').innerText = drop.name;
-            document.getElementById('m-id').innerText = `🆔 ID: ${drop.id}`;
-            document.getElementById('m-java').innerText = `☕ Java: ${drop.java_version}`;
-            document.getElementById('m-bedrock').innerText = `📱 Bedrock: ${drop.bedrock_version}`;
+            document.getElementById('m-id').innerText = `ID: ${drop.id}`;
+            document.getElementById('m-java').innerText = `Java: ${drop.java_version}`;
+            document.getElementById('m-bedrock').innerText = `Bedrock: ${drop.bedrock_version}`;
             document.getElementById('m-date').innerText = `${t('date')} ${dDate}`;
             
             document.getElementById('m-stars').innerHTML = renderStars(drop.avg_rating) + `<span style="font-size:1.1rem; color:var(--text-muted); margin-left:15px;"> ${drop.review_count} ${grammarWord}</span>`;
