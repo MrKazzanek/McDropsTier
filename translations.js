@@ -20,6 +20,7 @@ const translations = {
         sort_oldest: "Najstarsze najpierw",
         sort_highest: "Najlepiej oceniane",
         sort_lowest: "Najgorzej oceniane",
+        show_all_langs: "Pokaż opinie ze wszystkich języków",
         empty_reviews_title: "Strasznie tu pusto...",
         empty_reviews_desc: "Bądź pierwszą osobą, która oceni ten drop na Discordzie!",
         loading_reviews: "Ładowanie opinii...",
@@ -50,6 +51,7 @@ const translations = {
         sort_oldest: "Oldest first",
         sort_highest: "Highest rated",
         sort_lowest: "Lowest rated",
+        show_all_langs: "Show reviews from all languages",
         empty_reviews_title: "It's awfully quiet here...",
         empty_reviews_desc: "Be the first person to rate this drop on Discord!",
         loading_reviews: "Loading reviews...",
@@ -61,11 +63,10 @@ const translations = {
     }
 };
 
-// Funkcja do poprawnej odmiany słowa "opinia" / "review" w zależności od języka
 function getReviewWord(count, lang) {
     if (lang === 'en') {
         return count === 1 ? "review" : "reviews";
-    } else { // 'pl'
+    } else {
         if (count === 1) return "opinia";
         const lastDigit = count % 10;
         const lastTwoDigits = count % 100;
