@@ -134,15 +134,25 @@
         
         .features-box { background: var(--bg-main); padding: 25px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 40px; line-height: 1.6; font-size: 1.05rem; border: 1px solid var(--border-color); }
 
+        /* === SEKCJA OPINII (Filtry i checkbox) === */
         .reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        
+        .filter-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        
         .filter-select { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 8px; outline: none; cursor: pointer; font-size: 0.95rem; font-family: inherit; transition: 0.3s; font-weight: 600; }
         .filter-select:focus, .filter-select:hover { border-color: var(--accent); }
 
-        .review-card { background: var(--bg-main); border-radius: 12px; padding: 22px; margin-bottom: 15px; display: flex; gap: 18px; border: 1px solid var(--border-color); animation: fadeUp 0.4s ease; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95rem; color: var(--text-muted); font-weight: 600; user-select: none; }
+        .checkbox-wrapper input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+
+        .review-card { background: var(--bg-main); border-radius: 12px; padding: 22px; margin-bottom: 15px; display: flex; gap: 18px; border: 1px solid var(--border-color); animation: fadeUp 0.4s ease; position: relative; }
         .review-card img { width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .review-content { flex: 1; }
         .review-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
-        .reviewer-name { font-weight: 700; font-size: 1.05rem; }
+        
+        .reviewer-name { font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        .lang-badge { font-size: 0.7rem; background: var(--bg-card); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; color: var(--text-muted); }
+        
         .review-text { color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
         .review-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; opacity: 0.8; }
 
@@ -164,6 +174,7 @@
             .discord-cta { flex-direction: column; text-align: center; }
             .modal-body { padding: 20px; }
             .review-card { flex-direction: column; gap: 12px; }
+            .filter-controls { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -262,12 +273,21 @@
 
                 <div class="reviews-header">
                     <h2 data-i18n="reviews_title">💬 Opinie Społeczności</h2>
-                    <select class="filter-select" id="review-sort" onchange="sortReviews()">
-                        <option value="newest" data-i18n="sort_newest">Najnowsze najpierw</option>
-                        <option value="oldest" data-i18n="sort_oldest">Najstarsze najpierw</option>
-                        <option value="highest" data-i18n="sort_highest">Najlepiej oceniane</option>
-                        <option value="lowest" data-i18n="sort_lowest">Najgorzej oceniane</option>
-                    </select>
+                    
+                    <div class="filter-controls">
+                        <!-- CHECKBOX JĘZYKA -->
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="show-all-langs" onchange="sortReviews()">
+                            <span data-i18n="show_all_langs">Pokaż opinie ze wszystkich języków</span>
+                        </label>
+
+                        <select class="filter-select" id="review-sort" onchange="sortReviews()">
+                            <option value="newest" data-i18n="sort_newest">Najnowsze najpierw</option>
+                            <option value="oldest" data-i18n="sort_oldest">Najstarsze najpierw</option>
+                            <option value="highest" data-i18n="sort_highest">Najlepiej oceniane</option>
+                            <option value="lowest" data-i18n="sort_lowest">Najgorzej oceniane</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div id="m-reviews"></div>
@@ -352,8 +372,12 @@
 
         // === KOPIOWANIE KOMENDY ===
         function copyCommand() {
-            // Zmiana komendy zgodnie z żądaniem
-            const cmd = `/review drop_id: ${currentActiveDropId}`;
+            // Zmiana komendy zależnie od wybranego języka
+            const cmdName = currentLang === 'en' ? 'review' : 'ocenka';
+            const cmdArg = currentLang === 'en' ? 'drop_id:' : 'id_dropu:';
+            
+            const cmd = `/${cmdName} ${cmdArg} ${currentActiveDropId}`;
+            
             navigator.clipboard.writeText(cmd).then(() => {
                 const btn = document.getElementById('copy-btn');
                 btn.innerHTML = `✅ ${t('copy_success')}`;
@@ -442,15 +466,19 @@
             currentActiveDropId = drop.id; 
             const grammarWord = getReviewWord(drop.review_count, currentLang);
 
+            // Wybór tekstu zależnie od wybranego języka, z zabezpieczeniem (jeśli ktoś nie dodał wersji EN, pokaże PL)
+            const dDate = currentLang === 'en' ? (drop.release_date_en || drop.release_date) : drop.release_date;
+            const dFeat = currentLang === 'en' ? (drop.features_en || drop.features) : drop.features;
+
             document.getElementById('m-banner').src = drop.banner_url;
             document.getElementById('m-title').innerText = drop.name;
             document.getElementById('m-id').innerText = `🆔 ID: ${drop.id}`;
             document.getElementById('m-java').innerText = `☕ Java: ${drop.java_version}`;
             document.getElementById('m-bedrock').innerText = `📱 Bedrock: ${drop.bedrock_version}`;
-            document.getElementById('m-date').innerText = `${t('date')} ${drop.release_date}`;
+            document.getElementById('m-date').innerText = `${t('date')} ${dDate}`;
             
             document.getElementById('m-stars').innerHTML = renderStars(drop.avg_rating) + `<span style="font-size:1.1rem; color:var(--text-muted); margin-left:15px;"> ${drop.review_count} ${grammarWord}</span>`;
-            document.getElementById('m-features').innerText = drop.features;
+            document.getElementById('m-features').innerText = dFeat;
             
             document.getElementById('review-sort').value = 'newest';
             document.getElementById('m-reviews').innerHTML = `<div style="text-align:center; padding: 20px; color: var(--accent); font-weight:bold;">${t('loading_reviews')}</div>`;
@@ -475,7 +503,16 @@
         }
 
         function sortReviews() {
-            if(currentReviews.length === 0) {
+            const showAllLangs = document.getElementById('show-all-langs').checked;
+            
+            // Filtrowanie opinii względem języka (jeśli box nie jest zaznaczony)
+            let filteredReviews = currentReviews;
+            if (!showAllLangs) {
+                // Zakładamy, że stare opinie bez przypisanego języka mają wartość null, traktujemy je jako 'pl'
+                filteredReviews = currentReviews.filter(r => (r.language || 'pl') === currentLang);
+            }
+
+            if(filteredReviews.length === 0) {
                 document.getElementById('m-reviews').innerHTML = `
                     <div style="text-align:center; padding: 40px; background: var(--bg-main); border-radius: 12px; margin-top: 20px; border: 1px dashed var(--border-color);">
                         <div style="font-size: 3rem; margin-bottom: 15px;">👻</div>
@@ -487,19 +524,22 @@
 
             const sortBy = document.getElementById('review-sort').value;
             
-            currentReviews.sort((a, b) => {
+            filteredReviews.sort((a, b) => {
                 if(sortBy === 'newest') return b.created_at - a.created_at;
                 if(sortBy === 'oldest') return a.created_at - b.created_at;
                 if(sortBy === 'highest') return b.rating - a.rating;
                 if(sortBy === 'lowest') return a.rating - b.rating;
             });
 
-            document.getElementById('m-reviews').innerHTML = currentReviews.map(r => `
+            document.getElementById('m-reviews').innerHTML = filteredReviews.map(r => `
                 <div class="review-card">
                     <img src="${r.avatar_url}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'" alt="Avatar">
                     <div class="review-content">
                         <div class="review-top">
-                            <span class="reviewer-name">${r.username}</span>
+                            <span class="reviewer-name">
+                                ${r.username}
+                                ${showAllLangs ? `<span class="lang-badge">${r.language || 'PL'}</span>` : ''}
+                            </span>
                             <span class="stars" style="font-size: 1.1rem;">${renderStars(r.rating).split('<')[0]}</span>
                         </div>
                         <div class="review-text">${r.review_text}</div>
