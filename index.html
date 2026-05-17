@@ -5,138 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>McDropTier - Oceny Aktualizacji Minecraft</title>
     <style>
-        /* === ZMIENNE KOLORYSTYCZNE (Mroczny / Gamingowy styl) === */
+        /* === ZMIENNE KOLORYSTYCZNE === */
         :root {
-            --bg-main: #0b0b0e;
-            --bg-card: #15151a;
-            --bg-card-hover: #1c1c24;
-            --text-main: #f0f0f0;
-            --text-muted: #888899;
-            --accent: #5865F2; /* Discord Blurple */
+            /* MOTYW CIEMNY (Domyślny) */
+            --bg-main: #0f1015;
+            --bg-card: #181922;
+            --bg-card-hover: #1e1f29;
+            --text-main: #f2f3f5;
+            --text-muted: #949ba4;
+            --accent: #5865F2; 
             --accent-hover: #4752C4;
-            --star-color: #ffbb00;
-            --border-color: rgba(255, 255, 255, 0.05);
-            --glass-bg: rgba(11, 11, 14, 0.8);
+            --star-color: #ffcc00;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(15, 16, 21, 0.85);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --discord-banner: linear-gradient(135deg, #2b2d3a, #181922);
+        }
+
+        [data-theme="light"] {
+            /* MOTYW JASNY */
+            --bg-main: #f2f3f5;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8f9fa;
+            --text-main: #2e3338;
+            --text-muted: #5c5e66;
+            --accent: #5865F2; 
+            --accent-hover: #4752C4;
+            --star-color: #f1b300;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --discord-banner: linear-gradient(135deg, #ffffff, #e3e5e8);
         }
 
         /* === RESET & SCROLLBAR === */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; transition: background-color 0.4s, color 0.4s; }
         
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg-main); }
-        ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb { background: #4f545c; border-radius: 10px; border: 2px solid var(--bg-main); }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
         /* === NAGŁÓWEK (Sticky) === */
-        header { position: sticky; top: 0; z-index: 100; background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
-        .logo-container { display: flex; align-items: center; gap: 15px; font-size: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .logo-container img { height: 40px; filter: drop-shadow(0 0 8px rgba(88, 101, 242, 0.5)); }
+        header { position: sticky; top: 0; z-index: 100; background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
+        .logo-container { display: flex; align-items: center; gap: 12px; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .logo-container img { height: 38px; filter: drop-shadow(0 2px 5px rgba(88, 101, 242, 0.4)); }
         
-        .search-box { position: relative; }
-        .search-box input { background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 10px 20px; border-radius: 25px; outline: none; width: 250px; transition: 0.3s; }
-        .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(88, 101, 242, 0.3); width: 300px; }
+        .header-controls { display: flex; align-items: center; gap: 15px; }
+        .search-box input { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 18px; border-radius: 20px; outline: none; width: 220px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-family: inherit;}
+        .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.2); width: 280px; }
+        
+        .theme-toggle { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--accent); color: white; border-color: var(--accent); transform: rotate(15deg); }
 
         /* === MAIN KONTENER === */
         main { flex: 1; display: flex; flex-direction: column; }
 
         /* === BANER GŁÓWNY (Hero) === */
-        .hero { position: relative; height: 350px; display: flex; justify-content: center; align-items: center; overflow: hidden; text-align: center; }
-        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('LINK_DO_TLA_BANERU.jpg') center/cover; filter: blur(5px) brightness(0.4); z-index: 1; transform: scale(1.05); }
-        .hero-content { position: relative; z-index: 2; padding: 20px; animation: fadeInDown 1s ease; }
-        .hero-content img { max-width: 300px; margin-bottom: 20px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)); }
-        .hero-content h1 { font-size: 2.5rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
-
-        /* === SEKCJA CALL TO ACTION (DISCORD) === */
-        .cta-section { background: linear-gradient(135deg, var(--bg-card), #181922); padding: 40px 20px; text-align: center; border-bottom: 1px solid var(--border-color); border-top: 1px solid var(--border-color); }
-        .cta-section h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--text-main); }
-        .cta-section p { color: var(--text-muted); margin-bottom: 20px; font-size: 1.1rem; }
-        .discord-btn { display: inline-block; background-color: var(--accent); color: white; padding: 12px 30px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 1.1rem; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4); }
-        .discord-btn:hover { background-color: var(--accent-hover); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6); }
+        .hero { position: relative; height: 380px; display: flex; justify-content: center; align-items: center; overflow: hidden; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .hero-bg { position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; background: url('TUTAJ_LINK_DO_TLA_Z_MINECRAFTA.jpg') center/cover; filter: blur(6px) brightness(0.35); z-index: 1; }
+        .hero-content { position: relative; z-index: 2; padding: 20px; animation: scaleUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .hero-content img { max-width: 250px; margin-bottom: 15px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6)); }
+        .hero-content h1 { font-size: 2.2rem; font-weight: 800; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.8); letter-spacing: 0.5px; }
 
         /* === ZAWARTOŚĆ STRONY (Dropy) === */
-        .container { max-width: 1300px; margin: 0 auto; padding: 40px 5%; width: 100%; }
-        .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
-        .section-title::before { content: ''; display: block; width: 6px; height: 30px; background: var(--accent); border-radius: 3px; }
+        .container { max-width: 1350px; margin: 0 auto; padding: 50px 5%; width: 100%; }
+        .section-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; }
+        .section-title::before { content: ''; display: block; width: 6px; height: 28px; background: var(--accent); border-radius: 4px; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-bottom: 60px; }
         
         /* Karty Dropów */
-        .card { background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; animation: fadeIn 0.6s ease; }
-        .card:hover { transform: translateY(-8px); background: var(--bg-card-hover); border-color: var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 15px rgba(88, 101, 242, 0.2); }
-        .card-img-wrapper { position: relative; height: 180px; overflow: hidden; }
-        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .card { background: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s, border-color 0.4s; box-shadow: 0 8px 20px var(--shadow-color); animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
+        .card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 15px 30px var(--shadow-color), 0 0 15px rgba(88, 101, 242, 0.15); }
+        .card-img-wrapper { position: relative; height: 170px; overflow: hidden; }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .card:hover .card-img-wrapper img { transform: scale(1.08); }
         
-        .drop-id-badge { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; font-family: monospace; letter-spacing: 1px; color: #aaa; border: 1px solid rgba(255,255,255,0.1); }
+        .drop-id-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; font-family: monospace; color: #fff; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
-        .card-content { padding: 20px; }
-        .card-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; }
-        .card-versions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; display: flex; gap: 15px; }
-        .version-badge { background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .card-content { padding: 22px; }
+        .card-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main); }
+        .card-versions { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .version-badge { background: var(--bg-main); padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600; }
         
-        .stars { color: var(--star-color); font-size: 1.2rem; display: flex; align-items: center; gap: 5px; }
-        .stars span { font-size: 0.9rem; color: var(--text-muted); margin-left: 5px; }
+        .stars { color: var(--star-color); font-size: 1.2rem; display: flex; align-items: center; }
+        .stars span { font-size: 0.9rem; color: var(--text-muted); margin-left: 8px; font-weight: 600; }
+
+        /* === PIĘKNY BANER DISCORD (Pod Dropami) === */
+        .discord-cta-wrapper { padding: 0 5% 50px 5%; max-width: 1350px; margin: 0 auto; width: 100%; }
+        .discord-cta { background: var(--discord-banner); border-radius: 16px; padding: 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); box-shadow: 0 10px 30px var(--shadow-color); flex-wrap: wrap; gap: 20px; }
+        .discord-text h2 { font-size: 1.8rem; margin-bottom: 8px; color: var(--text-main); }
+        .discord-text p { color: var(--text-muted); font-size: 1.05rem; }
+        .discord-btn { background-color: var(--accent); color: white; padding: 14px 32px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 1.1rem; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4); display: flex; align-items: center; gap: 10px; }
+        .discord-btn:hover { background-color: var(--accent-hover); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6); }
 
         /* === MODAL (Wyskakujące Okno) === */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .modal { background: var(--bg-card); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 20px; overflow-y: auto; position: relative; border: 1px solid var(--border-color); transform: scale(0.95); transition: transform 0.3s ease; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .modal-overlay.active .modal { transform: scale(1); }
+        .modal { background: var(--bg-card); width: 100%; max-width: 850px; max-height: 90vh; border-radius: 16px; overflow-y: auto; position: relative; border: 1px solid var(--border-color); transform: scale(0.9); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
+        .modal-overlay.active .modal { transform: scale(1); opacity: 1; }
         
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 2.5rem; color: white; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        .close-btn { position: absolute; top: 20px; right: 20px; color: white; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; backdrop-filter: blur(4px); }
+        .close-btn::before, .close-btn::after { content: ''; position: absolute; width: 20px; height: 2px; background: white; }
+        .close-btn::before { transform: rotate(45deg); }
+        .close-btn::after { transform: rotate(-45deg); }
         .close-btn:hover { background: var(--accent); transform: rotate(90deg); }
         
-        .modal-banner { width: 100%; height: 280px; object-fit: cover; border-bottom: 2px solid var(--accent); }
-        .modal-body { padding: 40px; }
-        .modal-title { font-size: 2.5rem; margin-bottom: 10px; }
-        .modal-info-bar { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted); }
-        .modal-info-bar div { background: rgba(255,255,255,0.03); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .modal-banner { width: 100%; height: 250px; object-fit: cover; }
+        .modal-body { padding: 35px; }
         
-        .features-box { background: rgba(0,0,0,0.2); padding: 25px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 40px; line-height: 1.7; font-size: 1.05rem; }
+        .modal-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
+        .modal-title { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+        
+        /* Przycisk Kopiowania Komendy */
+        .copy-cmd-btn { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .copy-cmd-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .copy-cmd-btn.success { background: rgba(46, 204, 113, 0.1); border-color: #2ecc71; color: #2ecc71; }
+
+        .modal-info-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 25px; font-size: 0.9rem; font-weight: 600; }
+        .modal-info-bar div { background: var(--bg-main); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-muted); }
+        
+        .features-box { background: var(--bg-main); padding: 25px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 40px; line-height: 1.6; font-size: 1.05rem; border: 1px solid var(--border-color); }
 
         /* Filtry opinii */
         .reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-        .filter-select { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; outline: none; cursor: pointer; font-size: 0.95rem; }
-        .filter-select:focus { border-color: var(--accent); }
+        .filter-select { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 8px; outline: none; cursor: pointer; font-size: 0.95rem; font-family: inherit; transition: 0.3s; font-weight: 600; }
+        .filter-select:focus, .filter-select:hover { border-color: var(--accent); }
 
         /* Pojedyncza opinia */
-        .review-card { background: var(--bg-main); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; gap: 20px; border: 1px solid var(--border-color); animation: fadeIn 0.4s ease; }
-        .review-card img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--accent); }
+        .review-card { background: var(--bg-main); border-radius: 12px; padding: 22px; margin-bottom: 15px; display: flex; gap: 18px; border: 1px solid var(--border-color); animation: fadeUp 0.4s ease; }
+        .review-card img { width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .review-content { flex: 1; }
-        .review-top { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
-        .reviewer-name { font-weight: bold; font-size: 1.1rem; }
-        .review-text { color: #ccc; line-height: 1.6; margin-bottom: 15px; }
-        .review-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .review-top { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+        .reviewer-name { font-weight: 700; font-size: 1.05rem; }
+        .review-text { color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
+        .review-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; opacity: 0.8; }
 
         /* === STOPKA === */
-        footer { background: var(--bg-card); padding: 30px; text-align: center; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.95rem; }
+        footer { background: var(--bg-card); padding: 25px; text-align: center; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.95rem; margin-top: auto; }
         footer span { color: var(--accent); font-weight: bold; }
 
         /* === ANIMACJE === */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleUp { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
         /* === RESPONSIVE === */
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 15px; padding: 15px; }
+            header { flex-wrap: wrap; gap: 15px; padding: 15px; justify-content: center; }
+            .header-controls { width: 100%; justify-content: space-between; }
             .search-box input { width: 100%; }
             .search-box input:focus { width: 100%; }
             .hero h1 { font-size: 1.8rem; }
+            .discord-cta { flex-direction: column; text-align: center; }
             .modal-body { padding: 20px; }
-            .review-card { flex-direction: column; gap: 10px; }
+            .review-card { flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- NAGŁÓWEK -->
     <header>
         <div class="logo-container">
-            <img src="LINK_DO_LOGO.png" alt="McDropTier Logo" onerror="this.src='https://i.imgur.com/KzDnd6N.png'">
+            <img src="TUTAJ_LINK_DO_LOGO.png" alt="Logo" onerror="this.src='https://i.imgur.com/KzDnd6N.png'">
             McDropTier
         </div>
-        <div class="search-box">
-            <input type="text" id="search" placeholder="🔍 Szukaj dropu (nazwa lub id)..." onkeyup="filterDrops()">
+        <div class="header-controls">
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Szukaj dropu..." onkeyup="filterDrops()">
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
         </div>
     </header>
 
@@ -145,27 +185,34 @@
         <section class="hero">
             <div class="hero-bg"></div>
             <div class="hero-content">
-                <img src="LINK_DO_LOGO.png" alt="Logo" onerror="this.style.display='none'">
+                <img src="TUTAJ_LINK_DO_LOGO.png" alt="Logo" onerror="this.style.display='none'">
                 <h1>Oceniaj Dropy z Minecrafta!</h1>
             </div>
         </section>
 
-        <!-- CALL TO ACTION -->
-        <section class="cta-section">
-            <h2>Masz opinię o najnowszej aktualizacji?</h2>
-            <p>Dołącz do naszej społeczności. Użyj komendy <code>/ocenka</code> na serwerze i zobacz swój wpis tutaj!</p>
-            <a href="LINK_DO_TWOJEGO_DISCORDA" target="_blank" class="discord-btn">Dołącz na nasz Discord</a>
-        </section>
-
+        <!-- KARTY DROPÓW -->
         <div class="container">
             <h2 class="section-title">🏆 Top 3 Najwyżej Oceniane</h2>
             <div class="grid" id="top-drops">
                 <p style="color: var(--text-muted);">Ładowanie najlepszych dropów...</p>
             </div>
 
-            <h2 class="section-title" style="margin-top: 40px;">📦 Wszystkie Dropy</h2>
+            <h2 class="section-title" style="margin-top: 20px;">📦 Wszystkie Dropy</h2>
             <div class="grid" id="all-drops">
                 <p style="color: var(--text-muted);">Ładowanie bazy danych...</p>
+            </div>
+        </div>
+
+        <!-- CALL TO ACTION (Zaproszenie na discord) -->
+        <div class="discord-cta-wrapper">
+            <div class="discord-cta">
+                <div class="discord-text">
+                    <h2>Gotowy, by ocenić aktualizację?</h2>
+                    <p>Zaloguj się na nasz serwer Discord i użyj komendy, aby zostawić recenzję!</p>
+                </div>
+                <a href="TUTAJ_LINK_DO_TWOJEGO_DISCORDA" target="_blank" class="discord-btn">
+                    🎮 Dołącz na nasz Discord
+                </a>
             </div>
         </div>
     </main>
@@ -173,11 +220,14 @@
     <!-- MODAL -->
     <div class="modal-overlay" id="modal" onclick="closeModal(event)">
         <div class="modal">
-            <span class="close-btn" onclick="document.getElementById('modal').classList.remove('active')">&times;</span>
+            <div class="close-btn" onclick="document.getElementById('modal').classList.remove('active')"></div>
             <img src="" id="m-banner" class="modal-banner">
             
             <div class="modal-body">
-                <h1 class="modal-title" id="m-title">Tytuł Dropu</h1>
+                <div class="modal-header-top">
+                    <h1 class="modal-title" id="m-title">Tytuł</h1>
+                    <button class="copy-cmd-btn" id="copy-btn" onclick="copyCommand()">📋 Kopiuj komendę</button>
+                </div>
                 
                 <div class="modal-info-bar">
                     <div id="m-id">🆔 ID: -</div>
@@ -186,10 +236,10 @@
                     <div id="m-date">📅 Data: -</div>
                 </div>
 
-                <div class="stars" id="m-stars" style="font-size: 2rem; margin-bottom: 30px;"></div>
+                <div class="stars" id="m-stars" style="font-size: 2.2rem; margin-bottom: 30px;"></div>
                 
                 <div class="features-box">
-                    <h3 style="margin-bottom: 10px; color: white;">✨ Co nowego?</h3>
+                    <h3 style="margin-bottom: 10px; color: var(--accent);">✨ Co nowego w tym dropie?</h3>
                     <p id="m-features"></p>
                 </div>
 
@@ -208,9 +258,10 @@
         </div>
     </div>
 
+    <!-- STOPKA -->
     <footer>
         McDropTier &copy; 2025. Wszelkie prawa zastrzeżone. <br>
-        Zaprojektowane z ❤️ do klocków przez <span>Twoją Społeczność</span>.
+        Stworzone z ❤️ dla społeczności <span>Twojego Serwera</span>.
     </footer>
 
     <script>
@@ -219,8 +270,37 @@
         
         let dropsData = [];
         let currentReviews = [];
+        let currentActiveDropId = "";
 
-        // Generowanie gwiazdek (obsługa połówek i ikon Unicode)
+        // === SYSTEM MOTYWÓW ===
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const btn = document.getElementById('theme-btn');
+            btn.innerText = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // === NARZĘDZIA JĘZYKOWE (Gramatyka) ===
+        // Poprawna odmiana: 1 opinia, 2-4 opinie, 5+ opinii
+        function pluralizeOpinions(count) {
+            if (count === 1) return "opinia";
+            const lastDigit = count % 10;
+            const lastTwoDigits = count % 100;
+            if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14)) return "opinie";
+            return "opinii";
+        }
+
+        // Generowanie gwiazdek
         function renderStars(rating) {
             let starsHtml = '';
             const r = Number(rating);
@@ -232,7 +312,21 @@
             return `${starsHtml} <span>(${r.toFixed(1)})</span>`;
         }
 
-        // Pobieranie Dropów
+        // === KOPIOWANIE KOMENDY ===
+        function copyCommand() {
+            const cmd = `/ocenka id_dropu: ${currentActiveDropId}`;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.innerHTML = '✅ Skopiowano!';
+                btn.classList.add('success');
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Kopiuj komendę';
+                    btn.classList.remove('success');
+                }, 2000);
+            });
+        }
+
+        // === POBIERANIE I RENDEROWANIE ===
         async function fetchDrops() {
             try {
                 const res = await fetch(`${API_URL}/drops`);
@@ -240,16 +334,17 @@
                 dropsData = await res.json();
                 renderDrops();
             } catch (e) {
-                const errorMsg = '<p style="color:#ff4444">Błąd łączenia z serwerem Bota. Upewnij się, że bot jest włączony.</p>';
-                document.getElementById('all-drops').innerHTML = errorMsg;
+                document.getElementById('all-drops').innerHTML = '<p style="color:#ff4444; font-weight:bold;">Błąd łączenia z bazą danych.</p>';
                 document.getElementById('top-drops').innerHTML = '';
             }
         }
 
-        // Generowanie Kafelka Dropu
-        function createCard(drop) {
+        function createCard(drop, index) {
+            const animationDelay = index * 0.1; // Kaskadowe pojawianie się
+            const grammarWord = pluralizeOpinions(drop.review_count);
+            
             return `
-                <div class="card" onclick="openModal('${drop.id}')">
+                <div class="card" onclick="openModal('${drop.id}')" style="animation-delay: ${animationDelay}s">
                     <div class="card-img-wrapper">
                         <div class="drop-id-badge">#${drop.id}</div>
                         <img src="${drop.banner_url}" alt="Baner" onerror="this.src='https://via.placeholder.com/600x300?text=Brak+Zdjecia'">
@@ -262,31 +357,32 @@
                         </div>
                         <div class="stars">
                             ${renderStars(drop.avg_rating)} 
-                            <span style="font-size:0.85rem">(${drop.review_count} opinii)</span>
+                            <span style="font-size:0.85rem">(${drop.review_count} ${grammarWord})</span>
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // Renderowanie list
         function renderDrops() {
             const top = [...dropsData].sort((a,b) => b.avg_rating - a.avg_rating).slice(0, 3);
-            document.getElementById('top-drops').innerHTML = top.map(createCard).join('');
-            document.getElementById('all-drops').innerHTML = dropsData.map(createCard).join('');
+            document.getElementById('top-drops').innerHTML = top.map((d, i) => createCard(d, i)).join('');
+            document.getElementById('all-drops').innerHTML = dropsData.map((d, i) => createCard(d, i)).join('');
         }
 
-        // Wyszukiwarka
         function filterDrops() {
             const query = document.getElementById('search').value.toLowerCase();
             const filtered = dropsData.filter(d => d.name.toLowerCase().includes(query) || d.id.toLowerCase().includes(query));
-            document.getElementById('all-drops').innerHTML = filtered.length > 0 ? filtered.map(createCard).join('') : '<p style="color:var(--text-muted)">Brak wyników wyszukiwania.</p>';
+            document.getElementById('all-drops').innerHTML = filtered.length > 0 ? filtered.map((d, i) => createCard(d, i)).join('') : '<p style="color:var(--text-muted)">Brak wyników wyszukiwania.</p>';
         }
 
-        // Otwieranie Modalu (Szczegółów)
+        // === MODAL ===
         async function openModal(id) {
             const drop = dropsData.find(d => d.id === id);
             if(!drop) return;
+            
+            currentActiveDropId = drop.id; // Zapis do funkcji kopiowania
+            const grammarWord = pluralizeOpinions(drop.review_count);
 
             document.getElementById('m-banner').src = drop.banner_url;
             document.getElementById('m-title').innerText = drop.name;
@@ -295,37 +391,35 @@
             document.getElementById('m-bedrock').innerText = `📱 Bedrock: ${drop.bedrock_version}`;
             document.getElementById('m-date').innerText = `📅 Data: ${drop.release_date}`;
             
-            document.getElementById('m-stars').innerHTML = renderStars(drop.avg_rating) + `<span style="font-size:1.1rem; color:var(--text-muted); margin-left:15px;"> ${drop.review_count} wystawionych ocen</span>`;
+            document.getElementById('m-stars').innerHTML = renderStars(drop.avg_rating) + `<span style="font-size:1.1rem; color:var(--text-muted); margin-left:15px;"> ${drop.review_count} ${grammarWord}</span>`;
             document.getElementById('m-features').innerText = drop.features;
             
-            document.getElementById('review-sort').value = 'newest'; // reset filtru
-            document.getElementById('m-reviews').innerHTML = '<div style="text-align:center; padding: 20px; color: var(--accent);">Ładowanie opinii...</div>';
+            document.getElementById('review-sort').value = 'newest';
+            document.getElementById('m-reviews').innerHTML = '<div style="text-align:center; padding: 20px; color: var(--accent); font-weight:bold;">Ładowanie opinii...</div>';
             document.getElementById('modal').classList.add('active');
 
             try {
                 const res = await fetch(`${API_URL}/drops/${id}/reviews`);
                 currentReviews = await res.json();
-                sortReviews(); // Wywołuje od razu render i sortowanie domyślne
+                sortReviews(); 
             } catch (e) {
-                document.getElementById('m-reviews').innerHTML = '<p style="color:#ff4444">Błąd ładowania opinii.</p>';
+                document.getElementById('m-reviews').innerHTML = '<p style="color:#ff4444">Błąd ładowania opinii z serwera.</p>';
             }
         }
 
-        // Zamykanie Modalu
         function closeModal(e) {
             if(e.target.id === 'modal') {
                 document.getElementById('modal').classList.remove('active');
             }
         }
 
-        // Filtrowanie i Renderowanie Opinii
         function sortReviews() {
             if(currentReviews.length === 0) {
                 document.getElementById('m-reviews').innerHTML = `
-                    <div style="text-align:center; padding: 40px; background: rgba(0,0,0,0.2); border-radius: 12px; margin-top: 20px;">
+                    <div style="text-align:center; padding: 40px; background: var(--bg-main); border-radius: 12px; margin-top: 20px; border: 1px dashed var(--border-color);">
                         <div style="font-size: 3rem; margin-bottom: 15px;">👻</div>
                         <h3 style="color: var(--text-main);">Strasznie tu pusto...</h3>
-                        <p style="color: var(--text-muted); margin-top: 5px;">Bądź pierwszą osobą, która oceni ten drop! Użyj komendy /ocenka na Discordzie.</p>
+                        <p style="color: var(--text-muted); margin-top: 5px;">Bądź pierwszą osobą, która oceni ten drop na Discordzie!</p>
                     </div>`;
                 return;
             }
@@ -357,7 +451,7 @@
             `).join('');
         }
 
-        // Start
+        // Start aplikacji
         fetchDrops();
     </script>
 </body>
