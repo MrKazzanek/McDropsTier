@@ -42,7 +42,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; transition: background-color 0.4s, color 0.4s; }
         
-        /* KLASA BLOKUJĄCA SCROLLOWANIE TŁA */
         body.no-scroll { overflow: hidden; }
 
         ::-webkit-scrollbar { width: 10px; }
@@ -189,12 +188,16 @@
 
         <!-- KARTY DROPÓW -->
         <div class="container">
-            <h2 class="section-title">🏆 Top 3 Najwyżej Oceniane</h2>
-            <div class="grid" id="top-drops">
-                <p style="color: var(--text-muted);">Ładowanie najlepszych dropów...</p>
+            <!-- SEKCJA TOP 3 -->
+            <div id="top-section">
+                <h2 class="section-title">🏆 Top 3 Najwyżej Oceniane</h2>
+                <div class="grid" id="top-drops">
+                    <p style="color: var(--text-muted);">Ładowanie najlepszych dropów...</p>
+                </div>
             </div>
 
-            <h2 class="section-title" style="margin-top: 20px;">📦 Wszystkie Dropy</h2>
+            <!-- SEKCJA WSZYSTKICH DROPÓW -->
+            <h2 class="section-title" id="all-drops-title" style="margin-top: 20px;">📦 Wszystkie Dropy</h2>
             <div class="grid" id="all-drops">
                 <p style="color: var(--text-muted);">Ładowanie bazy danych...</p>
             </div>
@@ -290,7 +293,7 @@
             btn.innerText = theme === 'dark' ? '☀️' : '🌙';
         }
 
-        // === NARZĘDZIA JĘZYKOWE (Gramatyka) ===
+        // === NARZĘDZIA JĘZYKOWE ===
         function pluralizeOpinions(count) {
             if (count === 1) return "opinia";
             const lastDigit = count % 10;
@@ -368,10 +371,26 @@
             document.getElementById('all-drops').innerHTML = dropsData.map((d, i) => createCard(d, i)).join('');
         }
 
+        // === WYSZUKIWARKA I UKRYWANIE TOPKI ===
         function filterDrops() {
-            const query = document.getElementById('search').value.toLowerCase();
+            const query = document.getElementById('search').value.toLowerCase().trim();
+            const topSection = document.getElementById('top-section');
+            const allDropsTitle = document.getElementById('all-drops-title');
+
+            if (query === '') {
+                topSection.style.display = 'block';
+                allDropsTitle.innerHTML = '📦 Wszystkie Dropy';
+                renderDrops(); 
+                return;
+            }
+
+            topSection.style.display = 'none';
+            allDropsTitle.innerHTML = `🔍 Wyniki Wyszukiwania: "${query}"`;
+            
             const filtered = dropsData.filter(d => d.name.toLowerCase().includes(query) || d.id.toLowerCase().includes(query));
-            document.getElementById('all-drops').innerHTML = filtered.length > 0 ? filtered.map((d, i) => createCard(d, i)).join('') : '<p style="color:var(--text-muted)">Brak wyników wyszukiwania.</p>';
+            document.getElementById('all-drops').innerHTML = filtered.length > 0 
+                ? filtered.map((d, i) => createCard(d, i)).join('') 
+                : '<p style="font-size: 1.1rem; color: #ff4444; font-weight: bold;">Brak wyników wyszukiwania.</p>';
         }
 
         // === MODAL Z BLOKADĄ SCROLLA ===
@@ -379,7 +398,6 @@
             const drop = dropsData.find(d => d.id === id);
             if(!drop) return;
             
-            // Zablokuj scrollowanie tła
             document.body.classList.add('no-scroll');
 
             currentActiveDropId = drop.id; 
@@ -408,17 +426,13 @@
             }
         }
 
-        // Zamykanie modalu klikając w przycisk 'X'
         function closeModalBtn() {
             document.getElementById('modal').classList.remove('active');
-            document.body.classList.remove('no-scroll'); // Odblokowanie scrolla
+            document.body.classList.remove('no-scroll'); 
         }
 
-        // Zamykanie modalu klikając poza niego (w tło)
         function closeModalOutside(e) {
-            if(e.target.id === 'modal') {
-                closeModalBtn();
-            }
+            if(e.target.id === 'modal') closeModalBtn();
         }
 
         function sortReviews() {
