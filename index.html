@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McDropTier - Oceny Aktualizacji</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --accent: #2b8a3e;
+            --star: #ffd700;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent: #40c057;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; }
+        
+        header { background: var(--card-bg); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); }
+        .controls { display: flex; gap: 15px; }
+        input[type="text"] { padding: 8px 15px; border-radius: 20px; border: 1px solid var(--text-muted); background: var(--bg); color: var(--text); outline: none;}
+        button.theme-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text); }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        
+        .section-title { font-size: 1.8rem; margin-bottom: 1rem; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 3rem;}
+        
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 160px; object-fit: cover; }
+        .card-content { padding: 15px; }
+        .card-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .card-versions { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+        .stars { color: var(--star); font-size: 1.1rem; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;}
+        .modal { background: var(--card-bg); width: 100%; max-width: 800px; max-height: 90vh; border-radius: 12px; overflow-y: auto; position: relative; }
+        .modal-banner { width: 100%; height: 200px; object-fit: cover; }
+        .modal-content { padding: 2rem; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; }
+        
+        .review { background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 15px;}
+        .review img { width: 40px; height: 40px; border-radius: 50%; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 5px;}
+        .review-id { font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;}
+
+        footer { text-align: center; padding: 2rem; background: var(--card-bg); margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🎮 McDropTier</div>
+        <div class="controls">
+            <input type="text" id="search" placeholder="Szukaj dropu..." onkeyup="filterDrops()">
+            <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">🏆 Top 3 Najlepsze Dropy</h2>
+        <div class="grid" id="top-drops">Ładowanie...</div>
+
+        <h2 class="section-title">📦 Wszystkie Dropy</h2>
+        <div class="grid" id="all-drops">Ładowanie...</div>
+    </div>
+
+    <!-- MODAL (SZCZEGÓŁY) -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal">
+            <span class="close-btn" onclick="document.getElementById('modal').style.display='none'">&times;</span>
+            <img src="" id="m-banner" class="modal-banner">
+            <div class="modal-content">
+                <h1 id="m-title">Tytuł</h1>
+                <div style="color: var(--text-muted); margin-bottom: 15px;" id="m-info">Wersje | Data | ID</div>
+                <div class="stars" id="m-stars" style="font-size: 1.5rem; margin-bottom: 20px;"></div>
+                <h3>Nowości w Dropie:</h3>
+                <p id="m-features" style="line-height: 1.6;"></p>
+                <hr style="border: 0; border-top: 1px solid var(--text-muted); margin: 30px 0;">
+                <h3>Opinie Społeczności:</h3>
+                <div id="m-reviews"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        McDropTier &copy; 2025. Bot stworzony do oceniania aktualizacji Minecraft. Wszelkie prawa zastrzeżone.
+    </footer>
+
+    <script>
+        // === TUTAJ PODAJ IP I PORT SWOJEGO BOTA ===
+        const API_URL = 'http://83.168.69.7:40069/api'; 
+        
+        let dropsData = [];
+
+        // Motyw
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.body.setAttribute('data-theme', theme);
+
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // Renderowanie Gwiazdek (Wspiera połówki)
+        function renderStars(rating) {
+            let starsHtml = '';
+            for(let i=1; i<=5; i++) {
+                if (rating >= i) starsHtml += '★';
+                else if (rating >= i - 0.5) starsHtml += '⯨'; // Pół gwiazdki
+                else starsHtml += '☆';
+            }
+            return starsHtml + ` (${Number(rating).toFixed(1)})`;
+        }
+
+        // Pobieranie Danych z Bota
+        async function fetchDrops() {
+            try {
+                const res = await fetch(`${API_URL}/drops`);
+                dropsData = await res.json();
+                renderDrops();
+            } catch (e) {
+                document.getElementById('all-drops').innerHTML = '<p style="color:red">Nie można połączyć z serwerem bota.</p>';
+                document.getElementById('top-drops').innerHTML = '';
+            }
+        }
+
+        function createCard(drop) {
+            return `
+                <div class="card" onclick="openModal('${drop.id}')">
+                    <img src="${drop.banner_url}" alt="Banner">
+                    <div class="card-content">
+                        <div class="card-title">${drop.name}</div>
+                        <div class="card-versions">Java: ${drop.java_version} | BE: ${drop.bedrock_version}</div>
+                        <div class="stars">${renderStars(drop.avg_rating)} <span style="font-size:0.8rem; color:var(--text-muted)">(${drop.review_count} opinii)</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDrops() {
+            const top = [...dropsData].sort((a,b) => b.avg_rating - a.avg_rating).slice(0, 3);
+            document.getElementById('top-drops').innerHTML = top.map(createCard).join('');
+            document.getElementById('all-drops').innerHTML = dropsData.map(createCard).join('');
+        }
+
+        function filterDrops() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filtered = dropsData.filter(d => d.name.toLowerCase().includes(query) || d.id.toLowerCase().includes(query));
+            document.getElementById('all-drops').innerHTML = filtered.map(createCard).join('');
+        }
+
+        // Okienko Szczegółów (Modal)
+        async function openModal(id) {
+            const drop = dropsData.find(d => d.id === id);
+            document.getElementById('m-banner').src = drop.banner_url;
+            document.getElementById('m-title').innerText = drop.name;
+            document.getElementById('m-info').innerText = `ID: ${drop.id} | Java: ${drop.java_version} | Bedrock: ${drop.bedrock_version} | Data: ${drop.release_date}`;
+            document.getElementById('m-stars').innerHTML = renderStars(drop.avg_rating) + ` - ${drop.review_count} Ocen`;
+            document.getElementById('m-features').innerText = drop.features;
+            
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('m-reviews').innerHTML = '<i>Ładowanie opinii...</i>';
+
+            // Pobieranie opinii
+            try {
+                const res = await fetch(`${API_URL}/drops/${id}/reviews`);
+                const reviews = await res.json();
+                
+                if(reviews.length === 0) {
+                    document.getElementById('m-reviews').innerHTML = 'Brak opinii. Bądź pierwszy wpisując /ocenka na Discordzie!';
+                    return;
+                }
+
+                document.getElementById('m-reviews').innerHTML = reviews.map(r => `
+                    <div class="review">
+                        <img src="${r.avatar_url}" alt="Avatar">
+                        <div style="flex-grow: 1;">
+                            <div class="review-header">
+                                <strong>${r.username}</strong>
+                                <span class="stars">${renderStars(r.rating).split(' ')[0]}</span>
+                            </div>
+                            <div>${r.review_text}</div>
+                            <div class="review-id">Data: ${new Date(r.created_at).toLocaleDateString()} | ID Opinii: ${r.id}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                document.getElementById('m-reviews').innerHTML = '<p style="color:red">Błąd pobierania opinii.</p>';
+            }
+        }
+
+        function closeModal(e) {
+            if(e.target.id === 'modal') {
+                document.getElementById('modal').style.display = 'none';
+            }
+        }
+
+        // Inicjalizacja
+        fetchDrops();
+    </script>
+</body>
+</html>
