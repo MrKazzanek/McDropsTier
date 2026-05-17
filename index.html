@@ -7,7 +7,7 @@
     <style>
         /* === ZMIENNE KOLORYSTYCZNE === */
         :root {
-            /* MOTYW CIEMNY (Domyślny) */
+            /* MOTYW CIEMNY */
             --bg-main: #0f1015;
             --bg-card: #181922;
             --bg-card-hover: #1e1f29;
@@ -42,6 +42,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; transition: background-color 0.4s, color 0.4s; }
         
+        /* KLASA BLOKUJĄCA SCROLLOWANIE TŁA */
+        body.no-scroll { overflow: hidden; }
+
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg-main); }
         ::-webkit-scrollbar-thumb { background: #4f545c; border-radius: 10px; border: 2px solid var(--bg-main); }
@@ -59,9 +62,6 @@
         .theme-toggle { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem; }
         .theme-toggle:hover { background: var(--accent); color: white; border-color: var(--accent); transform: rotate(15deg); }
 
-        /* === MAIN KONTENER === */
-        main { flex: 1; display: flex; flex-direction: column; }
-
         /* === BANER GŁÓWNY (Hero) === */
         .hero { position: relative; height: 380px; display: flex; justify-content: center; align-items: center; overflow: hidden; text-align: center; border-bottom: 1px solid var(--border-color); }
         .hero-bg { position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; background: url('TUTAJ_LINK_DO_TLA_Z_MINECRAFTA.jpg') center/cover; filter: blur(6px) brightness(0.35); z-index: 1; }
@@ -69,14 +69,14 @@
         .hero-content img { max-width: 250px; margin-bottom: 15px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6)); }
         .hero-content h1 { font-size: 2.2rem; font-weight: 800; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.8); letter-spacing: 0.5px; }
 
-        /* === ZAWARTOŚĆ STRONY (Dropy) === */
+        /* === ZAWARTOŚĆ STRONY === */
+        main { flex: 1; display: flex; flex-direction: column; }
         .container { max-width: 1350px; margin: 0 auto; padding: 50px 5%; width: 100%; }
         .section-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; }
         .section-title::before { content: ''; display: block; width: 6px; height: 28px; background: var(--accent); border-radius: 4px; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-bottom: 60px; }
         
-        /* Karty Dropów */
         .card { background: var(--bg-card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s, border-color 0.4s; box-shadow: 0 8px 20px var(--shadow-color); animation: fadeUp 0.6s ease forwards; opacity: 0; transform: translateY(20px); }
         .card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 15px 30px var(--shadow-color), 0 0 15px rgba(88, 101, 242, 0.15); }
         .card-img-wrapper { position: relative; height: 170px; overflow: hidden; }
@@ -93,15 +93,15 @@
         .stars { color: var(--star-color); font-size: 1.2rem; display: flex; align-items: center; }
         .stars span { font-size: 0.9rem; color: var(--text-muted); margin-left: 8px; font-weight: 600; }
 
-        /* === PIĘKNY BANER DISCORD (Pod Dropami) === */
+        /* === BANER DISCORD === */
         .discord-cta-wrapper { padding: 0 5% 50px 5%; max-width: 1350px; margin: 0 auto; width: 100%; }
         .discord-cta { background: var(--discord-banner); border-radius: 16px; padding: 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); box-shadow: 0 10px 30px var(--shadow-color); flex-wrap: wrap; gap: 20px; }
         .discord-text h2 { font-size: 1.8rem; margin-bottom: 8px; color: var(--text-main); }
         .discord-text p { color: var(--text-muted); font-size: 1.05rem; }
-        .discord-btn { background-color: var(--accent); color: white; padding: 14px 32px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 1.1rem; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4); display: flex; align-items: center; gap: 10px; }
+        .discord-btn { background-color: var(--accent); color: white; padding: 14px 32px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 1.1rem; transition: 0.3s; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4); display: flex; align-items: center; gap: 10px; border: none; cursor: pointer; }
         .discord-btn:hover { background-color: var(--accent-hover); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6); }
 
-        /* === MODAL (Wyskakujące Okno) === */
+        /* === MODAL === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal { background: var(--bg-card); width: 100%; max-width: 850px; max-height: 90vh; border-radius: 16px; overflow-y: auto; position: relative; border: 1px solid var(--border-color); transform: scale(0.9); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
@@ -116,25 +116,22 @@
         .modal-banner { width: 100%; height: 250px; object-fit: cover; }
         .modal-body { padding: 35px; }
         
-        .modal-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
-        .modal-title { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+        .modal-title { font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
         
-        /* Przycisk Kopiowania Komendy */
-        .copy-cmd-btn { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .copy-cmd-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .copy-cmd-btn.success { background: rgba(46, 204, 113, 0.1); border-color: #2ecc71; color: #2ecc71; }
-
-        .modal-info-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 25px; font-size: 0.9rem; font-weight: 600; }
+        .modal-info-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; font-size: 0.9rem; font-weight: 600; }
         .modal-info-bar div { background: var(--bg-main); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-muted); }
+
+        .modal-actions { margin-bottom: 30px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .copy-cmd-btn { background: rgba(88, 101, 242, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-family: inherit; }
+        .copy-cmd-btn:hover { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4); transform: translateY(-2px); }
+        .copy-cmd-btn.success { background: #2ecc71; border-color: #2ecc71; color: white; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); }
         
         .features-box { background: var(--bg-main); padding: 25px; border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 40px; line-height: 1.6; font-size: 1.05rem; border: 1px solid var(--border-color); }
 
-        /* Filtry opinii */
         .reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
         .filter-select { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 8px; outline: none; cursor: pointer; font-size: 0.95rem; font-family: inherit; transition: 0.3s; font-weight: 600; }
         .filter-select:focus, .filter-select:hover { border-color: var(--accent); }
 
-        /* Pojedyncza opinia */
         .review-card { background: var(--bg-main); border-radius: 12px; padding: 22px; margin-bottom: 15px; display: flex; gap: 18px; border: 1px solid var(--border-color); animation: fadeUp 0.4s ease; }
         .review-card img { width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .review-content { flex: 1; }
@@ -218,16 +215,13 @@
     </main>
 
     <!-- MODAL -->
-    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
         <div class="modal">
-            <div class="close-btn" onclick="document.getElementById('modal').classList.remove('active')"></div>
+            <div class="close-btn" onclick="closeModalBtn()"></div>
             <img src="" id="m-banner" class="modal-banner">
             
             <div class="modal-body">
-                <div class="modal-header-top">
-                    <h1 class="modal-title" id="m-title">Tytuł</h1>
-                    <button class="copy-cmd-btn" id="copy-btn" onclick="copyCommand()">📋 Kopiuj komendę</button>
-                </div>
+                <h1 class="modal-title" id="m-title">Tytuł</h1>
                 
                 <div class="modal-info-bar">
                     <div id="m-id">🆔 ID: -</div>
@@ -236,7 +230,14 @@
                     <div id="m-date">📅 Data: -</div>
                 </div>
 
-                <div class="stars" id="m-stars" style="font-size: 2.2rem; margin-bottom: 30px;"></div>
+                <!-- SEKCJA AKCJI I OCEN -->
+                <div class="modal-actions">
+                    <div class="stars" id="m-stars" style="font-size: 2.2rem;"></div>
+                    <button class="copy-cmd-btn" id="copy-btn" onclick="copyCommand()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Kopiuj komendę do oceny
+                    </button>
+                </div>
                 
                 <div class="features-box">
                     <h3 style="margin-bottom: 10px; color: var(--accent);">✨ Co nowego w tym dropie?</h3>
@@ -265,7 +266,6 @@
     </footer>
 
     <script>
-        // === KONFIGURACJA API ===
         const API_URL = '/api'; 
         
         let dropsData = [];
@@ -291,7 +291,6 @@
         }
 
         // === NARZĘDZIA JĘZYKOWE (Gramatyka) ===
-        // Poprawna odmiana: 1 opinia, 2-4 opinie, 5+ opinii
         function pluralizeOpinions(count) {
             if (count === 1) return "opinia";
             const lastDigit = count % 10;
@@ -300,13 +299,12 @@
             return "opinii";
         }
 
-        // Generowanie gwiazdek
         function renderStars(rating) {
             let starsHtml = '';
             const r = Number(rating);
             for(let i = 1; i <= 5; i++) {
                 if (r >= i) starsHtml += '★';
-                else if (r >= i - 0.5) starsHtml += '⯨'; // Połówka
+                else if (r >= i - 0.5) starsHtml += '⯨'; 
                 else starsHtml += '☆';
             }
             return `${starsHtml} <span>(${r.toFixed(1)})</span>`;
@@ -317,10 +315,10 @@
             const cmd = `/ocenka id_dropu: ${currentActiveDropId}`;
             navigator.clipboard.writeText(cmd).then(() => {
                 const btn = document.getElementById('copy-btn');
-                btn.innerHTML = '✅ Skopiowano!';
+                btn.innerHTML = '✅ Skopiowano do schowka!';
                 btn.classList.add('success');
                 setTimeout(() => {
-                    btn.innerHTML = '📋 Kopiuj komendę';
+                    btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Kopiuj komendę do oceny';
                     btn.classList.remove('success');
                 }, 2000);
             });
@@ -340,7 +338,7 @@
         }
 
         function createCard(drop, index) {
-            const animationDelay = index * 0.1; // Kaskadowe pojawianie się
+            const animationDelay = index * 0.1;
             const grammarWord = pluralizeOpinions(drop.review_count);
             
             return `
@@ -376,12 +374,15 @@
             document.getElementById('all-drops').innerHTML = filtered.length > 0 ? filtered.map((d, i) => createCard(d, i)).join('') : '<p style="color:var(--text-muted)">Brak wyników wyszukiwania.</p>';
         }
 
-        // === MODAL ===
+        // === MODAL Z BLOKADĄ SCROLLA ===
         async function openModal(id) {
             const drop = dropsData.find(d => d.id === id);
             if(!drop) return;
             
-            currentActiveDropId = drop.id; // Zapis do funkcji kopiowania
+            // Zablokuj scrollowanie tła
+            document.body.classList.add('no-scroll');
+
+            currentActiveDropId = drop.id; 
             const grammarWord = pluralizeOpinions(drop.review_count);
 
             document.getElementById('m-banner').src = drop.banner_url;
@@ -407,9 +408,16 @@
             }
         }
 
-        function closeModal(e) {
+        // Zamykanie modalu klikając w przycisk 'X'
+        function closeModalBtn() {
+            document.getElementById('modal').classList.remove('active');
+            document.body.classList.remove('no-scroll'); // Odblokowanie scrolla
+        }
+
+        // Zamykanie modalu klikając poza niego (w tło)
+        function closeModalOutside(e) {
             if(e.target.id === 'modal') {
-                document.getElementById('modal').classList.remove('active');
+                closeModalBtn();
             }
         }
 
@@ -451,7 +459,7 @@
             `).join('');
         }
 
-        // Start aplikacji
+        // Start
         fetchDrops();
     </script>
 </body>
