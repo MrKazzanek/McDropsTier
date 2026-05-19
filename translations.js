@@ -28,7 +28,10 @@ const translations = {
         footer_rights: "Wszelkie prawa zastrzeżone.",
         footer_made: "Stworzone przez QozaWorks dla społeczności",
         date: "Data:",
-        review_id: "ID Opinii"
+        review_id: "ID Opinii",
+        discord_hint: "Użyj tej komendy na naszym Discordzie, aby dodać swoją opinię!",
+        java: "Java:",
+        bedrock: "Bedrock:"
     },
     en: {
         search_placeholder: "Search...",
@@ -59,7 +62,10 @@ const translations = {
         footer_rights: "All rights reserved.",
         footer_made: "Created by QozaWorks for the community of",
         date: "Date:",
-        review_id: "Review ID"
+        review_id: "Review ID",
+        discord_hint: "Use this command on our Discord to add your review!",
+        java: "Java:",
+        bedrock: "Bedrock:"
     }
 };
 
